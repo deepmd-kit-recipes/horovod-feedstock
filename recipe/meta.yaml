@@ -15,16 +15,19 @@ source:
 build:
   number: 0
   script_env:
-    - HOROVOD_CUDA_HOME=$PREFIX
-    - HOROVOD_NCCL_HOME=$PREFIX
-    - HOROVOD_GPU_OPERATIONS=NCCL
+    - HOROVOD_CUDA_HOME=/usr/local/cuda  # [cuda_compiler_version != 'None']
+    - HOROVOD_NCCL_HOME=$PREFIX  # [cuda_compiler_version == '10.1']
+    - HOROVOD_GPU_OPERATIONS=NCCL  # [cuda_compiler_version == '10.1']
     - HOROVOD_WITH_TENSORFLOW=1
     - HOROVOD_WITHOUT_PYTORCH=1
     - HOROVOD_WITHOUT_MXNET=1
     - HOROVOD_WITH_MPI=1
   script:
     - "{{ PYTHON }} -m pip install . -vv"  # [unix]
+  skip: true  # [osx and cuda_compiler_version != 'None']
+  skip: true  # [ppc64le and cuda_compiler_version == 'None']
   skip: true  # [not linux]
+  skip: true  # [ppc64le]
 
 requirements:
   build:
@@ -32,12 +35,17 @@ requirements:
     - {{ compiler('cxx') }}
     - cmake  >=3.7
     - make  # [unix]
-    - ninja
+    - python                                 # [build_platform != target_platform]
+    - cross-python_{{ target_platform }}     # [build_platform != target_platform]
 
   host:
     - python
     - pip
-    - nccl  # [cuda_compiler_version != 'None']
+    - wheel
+    - pyyaml
+    - cloudpickle
+    - psutil
+    - nccl  # [cuda_compiler_version == '10.1']
     - mpich
     - mpi4py
     - tensorflow-base {{ tf_version }}* mkl*  # [cuda_compiler_version == 'None']
@@ -46,7 +54,10 @@ requirements:
 
   run:
     - python
-    - nccl  # [cuda_compiler_version != 'None']
+    - pyyaml
+    - cloudpickle
+    - psutil
+    - nccl  # [cuda_compiler_version == '10.1']
     - {{ pin_compatible('mpich') }}
     - {{ pin_compatible('cudatoolkit', max_pin='x.x') }}*  # [cuda_compiler_verion != 'None']
     - mpi4py
