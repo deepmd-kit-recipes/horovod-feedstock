@@ -24,7 +24,10 @@ build:
     - HOROVOD_WITH_MPI=1
   script:
     - "{{ PYTHON }} -m pip install . -vv"  # [unix]
+  skip: true  # [osx and cuda_compiler_version != 'None']
+  skip: true  # [ppc64le and cuda_compiler_version == 'None']
   skip: true  # [not linux]
+  skip: true  # [ppc64le and not py==38]
 
 requirements:
   build:
