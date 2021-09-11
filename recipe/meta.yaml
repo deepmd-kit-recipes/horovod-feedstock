@@ -27,7 +27,7 @@ build:
   skip: true  # [osx and cuda_compiler_version != 'None']
   skip: true  # [ppc64le and cuda_compiler_version == 'None']
   skip: true  # [not linux]
-  skip: true  # [ppc64le and not py==38]
+  skip: true  # [ppc64le]
 
 requirements:
   build:
