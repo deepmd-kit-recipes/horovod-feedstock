@@ -15,7 +15,7 @@ source:
 build:
   number: 0
   script_env:
-    - HOROVOD_CUDA_HOME=$PREFIX  # [cuda_compiler_version != 'None']
+    - HOROVOD_CUDA_HOME=/usr/local/cuda  # [cuda_compiler_version != 'None']
     - HOROVOD_NCCL_HOME=$PREFIX  # [cuda_compiler_version == '10.1']
     - HOROVOD_GPU_OPERATIONS=NCCL  # [cuda_compiler_version == '10.1']
     - HOROVOD_WITH_TENSORFLOW=1
