@@ -1,0 +1,73 @@
+{% set name = "horovod" %}
+{% set version = "0.22.1" %}
+{% set tf_version = "2.5.0" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  git_url: https://github.com/horovod/horovod
+  git_rev: v{{ version }}
+  patches:
+    - 3148.patch
+
+build:
+  number: 0
+  script_env:
+    - HOROVOD_CUDA_HOME=$PREFIX
+    - HOROVOD_NCCL_HOME=$PREFIX
+    - HOROVOD_GPU_OPERATIONS=NCCL
+    - HOROVOD_WITH_TENSORFLOW=1
+    - HOROVOD_WITHOUT_PYTORCH=1
+    - HOROVOD_WITHOUT_MXNET=1
+    - HOROVOD_WITH_MPI=1
+  script:
+    - "{{ PYTHON }} -m pip install . -vv"  # [unix]
+  skip: true  # [not linux]
+
+requirements:
+  build:
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
+    - cmake  >=3.7
+    - make  # [unix]
+    - ninja
+
+  host:
+    - python
+    - pip
+    - nccl  # [cuda_compiler_version != 'None']
+    - mpich
+    - mpi4py
+    - tensorflow-base {{ tf_version }}* mkl*  # [cuda_compiler_version == 'None']
+    - tensorflow-base {{ tf_version }}* gpu* # [cuda_compiler_version != 'None']
+    - cudatoolkit {{ cuda_compiler_version }}*  # [cuda_compiler_version != 'None']
+
+  run:
+    - python
+    - nccl  # [cuda_compiler_version != 'None']
+    - {{ pin_compatible('mpich') }}
+    - {{ pin_compatible('cudatoolkit', max_pin='x.x') }}*  # [cuda_compiler_verion != 'None']
+    - mpi4py
+    - tensorflow-base {{ tf_version }}* mkl*  # [cuda_compiler_version == 'None']
+    - tensorflow-base {{ tf_version }}* gpu* # [cuda_compiler_version != 'None']
+
+
+test:
+  imports:
+    - horovod
+    - horovod.tensorflow
+
+about:
+  home: https://github.com/horovod/horovod
+  license: Apache-2.0
+  license_family: Apache
+  license_file: LICENSE
+  summary: 'Distributed training framework for TensorFlow, Keras, PyTorch, and Apache MXNet.'
+  doc_url: https://github.com/horovod/horovod
+  dev_url: https://github.com/horovod/horovod
+
+extra:
+  recipe-maintainers:
+    - njzjz

@@ -1,0 +1,157 @@
+From 17614b2370fb4551c27b9b38ba27fbd3349834a2 Mon Sep 17 00:00:00 2001
+From: Jinzhe Zeng <jinzhe.zeng@rutgers.edu>
+Date: Fri, 3 Sep 2021 22:30:55 -0400
+Subject: [PATCH 1/3] fix MPICH implementation
+
+Fix #1637.
+
+I notice horovod's MPICH implementation is broken (#1637) but Intel MPI implementation is good. Per [Intel MPI's official page](https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/mpi-library.html), it implements the MPICH specification (in fact it's MPICH derivative), so we can safely use Intel MPI's implementation for MPICH.
+
+Signed-off-by: Jinzhe Zeng <jinzhe.zeng@rutgers.edu>
+---
+ horovod/runner/mpi_run.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/horovod/runner/mpi_run.py b/horovod/runner/mpi_run.py
+index 7b5be2787d..a9b39cc085 100644
+--- a/horovod/runner/mpi_run.py
++++ b/horovod/runner/mpi_run.py
+@@ -153,7 +153,7 @@ def mpi_run(settings, nics, env, command, stdout=None, stderr=None):
+     if mpi_impl_flags is None:
+         raise Exception(_MPI_NOT_FOUND_ERROR_MSG)
+ 
+-    impi = _IMPI_IMPL == mpi
++    impi = (_IMPI_IMPL == mpi or _MPICH_IMPL == mpi)
+ 
+     ssh_args = []
+     if settings.ssh_port:
+
+From ce40a3ee59c1f15b9a63ba0d5c868ad09ef78453 Mon Sep 17 00:00:00 2001
+From: Jinzhe Zeng <jinzhe.zeng@rutgers.edu>
+Date: Fri, 3 Sep 2021 23:34:09 -0400
+Subject: [PATCH 2/3] enable tests for MPICH and Intel MPI
+
+Signed-off-by: Jinzhe Zeng <jinzhe.zeng@rutgers.edu>
+---
+ test/integration/test_static_run.py | 10 +---------
+ 1 file changed, 1 insertion(+), 9 deletions(-)
+
+diff --git a/test/integration/test_static_run.py b/test/integration/test_static_run.py
+index 34e90714de..88322f8667 100644
+--- a/test/integration/test_static_run.py
++++ b/test/integration/test_static_run.py
+@@ -29,7 +29,7 @@
+ from horovod.runner.common.util import safe_shell_exec
+ from horovod.runner import _HorovodArgs
+ from horovod.runner.launch import _check_all_hosts_ssh_successful, _run
+-from horovod.runner.mpi_run import mpi_available, is_mpich, is_intel_mpi
++from horovod.runner.mpi_run import mpi_available
+ 
+ sys.path.append(os.path.join(os.path.dirname(__file__), os.pardir, 'utils'))
+ 
+@@ -141,10 +141,6 @@ def test_run_success(self, controller, mode, run):
+         if controller == 'mpi':
+             if not (mpi_built() and mpi_available()):
+                 self.skipTest("MPI is not available")
+-            if is_mpich():
+-                self.skipTest("MPICH is not testable")
+-            if is_intel_mpi():
+-                self.skipTest("Intel(R) MPI is not testable because it is based on MPICH")
+ 
+         self.do_test_run_with_controller_success(controller, mode, run)
+ 
+@@ -156,10 +152,6 @@ def test_run_failure(self, controller, mode, run):
+         if controller == 'mpi':
+             if not (mpi_built() and mpi_available()):
+                 self.skipTest("MPI is not available")
+-            if is_mpich():
+-                self.skipTest("MPICH is not testable")
+-            if is_intel_mpi():
+-                self.skipTest("Intel(R) MPI is not testable because it is based on MPICH")
+ 
+         self.do_test_run_with_controller_failure(controller, mode, run)
+ 
+
+From 7d42e11669125b86487ec836d81a326e78d08f41 Mon Sep 17 00:00:00 2001
+From: Jinzhe Zeng <jinzhe.zeng@rutgers.edu>
+Date: Tue, 7 Sep 2021 15:30:17 -0400
+Subject: [PATCH 3/3] rename `impi` to `impi_or_mpich`
+
+Signed-off-by: Jinzhe Zeng <jinzhe.zeng@rutgers.edu>
+---
+ horovod/runner/mpi_run.py | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
+
+diff --git a/horovod/runner/mpi_run.py b/horovod/runner/mpi_run.py
+index a9b39cc085..5bcce0bb8c 100644
+--- a/horovod/runner/mpi_run.py
++++ b/horovod/runner/mpi_run.py
+@@ -153,7 +153,7 @@ def mpi_run(settings, nics, env, command, stdout=None, stderr=None):
+     if mpi_impl_flags is None:
+         raise Exception(_MPI_NOT_FOUND_ERROR_MSG)
+ 
+-    impi = (_IMPI_IMPL == mpi or _MPICH_IMPL == mpi)
++    impi_or_mpich = mpi in (_IMPI_IMPL, _MPICH_IMPL)
+ 
+     ssh_args = []
+     if settings.ssh_port:
+@@ -164,27 +164,27 @@ def mpi_run(settings, nics, env, command, stdout=None, stderr=None):
+     mpi_ssh_args = ''
+     if ssh_args:
+         joined_ssh_args = ' '.join(ssh_args)
+-        mpi_ssh_args = f'-bootstrap=ssh -bootstrap-exec-args \"{joined_ssh_args}\"' if impi else f'-mca plm_rsh_args \"{joined_ssh_args}\"'
++        mpi_ssh_args = f'-bootstrap=ssh -bootstrap-exec-args \"{joined_ssh_args}\"' if impi_or_mpich else f'-mca plm_rsh_args \"{joined_ssh_args}\"'
+ 
+     tcp_intf_arg = '-mca btl_tcp_if_include {nics}'.format(
+-        nics=','.join(nics)) if nics and not impi else ''
++        nics=','.join(nics)) if nics and not impi_or_mpich else ''
+     nccl_socket_intf_arg = '-{opt} NCCL_SOCKET_IFNAME={nics}'.format(
+-        opt='genv' if impi else 'x',
++        opt='genv' if impi_or_mpich else 'x',
+         nics=','.join(nics)) if nics else ''
+ 
+     # On large cluster runs (e.g. Summit), we need extra settings to work around OpenMPI issues
+     host_names, host_to_slots = hosts.parse_hosts_and_slots(settings.hosts)
+-    if not impi and host_names and len(host_names) >= _LARGE_CLUSTER_THRESHOLD:
++    if not impi_or_mpich and host_names and len(host_names) >= _LARGE_CLUSTER_THRESHOLD:
+         mpi_impl_flags.append('-mca plm_rsh_no_tree_spawn true')
+         mpi_impl_flags.append('-mca plm_rsh_num_concurrent {}'.format(len(host_names)))
+ 
+     # if user does not specify any hosts, mpirun by default uses local host.
+     # There is no need to specify localhost.
+-    hosts_arg = '-{opt} {hosts}'.format(opt='hosts' if impi else 'H',
+-                hosts=','.join(host_names) if host_names and impi else settings.hosts)
++    hosts_arg = '-{opt} {hosts}'.format(opt='hosts' if impi_or_mpich else 'H',
++                hosts=','.join(host_names) if host_names and impi_or_mpich else settings.hosts)
+ 
+     ppn_arg = ' '
+-    if host_to_slots and impi:
++    if host_to_slots and impi_or_mpich:
+         ppn = host_to_slots[host_names[0]]
+         for h_name in host_names[1:]:
+             if ppn != host_to_slots[h_name]:
+@@ -192,19 +192,19 @@ def mpi_run(settings, nics, env, command, stdout=None, stderr=None):
+                                  Use -machinefile <machine_file> for this purpose.''')
+         ppn_arg = ' -ppn {} '.format(ppn)
+ 
+-    if settings.prefix_output_with_timestamp and not impi:
++    if settings.prefix_output_with_timestamp and not impi_or_mpich:
+         mpi_impl_flags.append('--timestamp-output')
+ 
+-    binding_args = settings.binding_args if settings.binding_args and not impi else ' '.join(impl_binding_args)
++    binding_args = settings.binding_args if settings.binding_args and not impi_or_mpich else ' '.join(impl_binding_args)
+ 
+-    basic_args = '-l' if impi else '--allow-run-as-root --tag-output'
++    basic_args = '-l' if impi_or_mpich else '--allow-run-as-root --tag-output'
+ 
+     output = []
+     if settings.output_filename:
+-        output.append('-outfile-pattern' if impi else '--output-filename')
++        output.append('-outfile-pattern' if impi_or_mpich else '--output-filename')
+         output.append(settings.output_filename)
+ 
+-    env_list = '' if impi else ' '.join(
++    env_list = '' if impi_or_mpich else ' '.join(
+                     '-x %s' % key for key in sorted(env.keys()) if env_util.is_exportable(key))
+ 
+     # Pass all the env variables to the mpirun command.
