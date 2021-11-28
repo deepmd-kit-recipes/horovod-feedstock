@@ -23,15 +23,15 @@ jobs:
       linux_64_cuda_compiler_version11.3python3.7._:
         CONFIG: linux_64_cuda_compiler_version11.3python3.7._
         UPLOAD_PACKAGES: 'True'
-        DOCKER_IMAGE: ghcr.io/deepmd-kit-recipes/linux-anvil-cuda:11.3
+        DOCKER_IMAGE: quay.io/condaforge/linux-anvil-cuda:11.3
       linux_64_cuda_compiler_version11.3python3.8._:
         CONFIG: linux_64_cuda_compiler_version11.3python3.8._
         UPLOAD_PACKAGES: 'True'
-        DOCKER_IMAGE: ghcr.io/deepmd-kit-recipes/linux-anvil-cuda:11.3
+        DOCKER_IMAGE: quay.io/condaforge/linux-anvil-cuda:11.3
       linux_64_cuda_compiler_version11.3python3.9._:
         CONFIG: linux_64_cuda_compiler_version11.3python3.9._
         UPLOAD_PACKAGES: 'True'
-        DOCKER_IMAGE: ghcr.io/deepmd-kit-recipes/linux-anvil-cuda:11.3
+        DOCKER_IMAGE: quay.io/condaforge/linux-anvil-cuda:11.3
       linux_64_cuda_compiler_versionNonepython3.7._:
         CONFIG: linux_64_cuda_compiler_versionNonepython3.7._
         UPLOAD_PACKAGES: 'True'
@@ -64,6 +64,11 @@ jobs:
         export CI=azure
         export GIT_BRANCH=$BUILD_SOURCEBRANCHNAME
         export FEEDSTOCK_NAME=$(basename ${BUILD_REPOSITORY_NAME})
+        if [[ "${BUILD_REASON:-}" == "PullRequest" ]]; then
+          export IS_PR_BUILD="True"
+        else
+          export IS_PR_BUILD="False"
+        fi
         .scripts/run_docker_build.sh
     displayName: Run docker build
     env:
