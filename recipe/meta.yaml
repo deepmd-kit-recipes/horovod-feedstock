@@ -67,6 +67,7 @@ requirements:
     - {{ pin_compatible('mpich') }}
     - mpi4py
     - tensorflow {{ tf_version }}.* {{ tf_variant }}*
+    - tensorflow-estimator
     - __cuda  # [cuda_compiler_version != "None"]
 
 
