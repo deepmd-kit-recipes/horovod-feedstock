@@ -22,6 +22,7 @@ build:
     - HOROVOD_CUDA_HOME=$PREFIX  # [cuda_compiler_version != 'None']
     - HOROVOD_NCCL_HOME=$PREFIX  # [cuda_compiler_version != 'None']
     - HOROVOD_GPU_OPERATIONS=NCCL  # [cuda_compiler_version != 'None']
+    - HOROVOD_NCCL_LINK=SHARED  # [cuda_compiler_version != 'None']
     - HOROVOD_WITH_TENSORFLOW=1
     - HOROVOD_WITHOUT_PYTORCH=1
     - HOROVOD_WITHOUT_MXNET=1
