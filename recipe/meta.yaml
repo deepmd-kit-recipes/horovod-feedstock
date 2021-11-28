@@ -1,6 +1,12 @@
 {% set name = "horovod" %}
-{% set version = "0.22.1" %}
-{% set tf_version = "2.5.0" %}
+{% set version = "0.23.0" %}
+{% set tf_version = "2.7" %}
+{% if cuda_compiler_version == "None" %}
+{% set tf_variant = "cpu" %}
+
+{% else %}
+{% set tf_variant = "cuda" %}
+{% endif %}
 
 package:
   name: {{ name|lower }}
@@ -10,14 +16,15 @@ source:
   git_url: https://github.com/horovod/horovod
   git_rev: v{{ version }}
   patches:
-    - 3148.patch
+    - 0001-disable-XLA.patch
 
 build:
-  number: 1
+  number: 0
   script_env:
     - HOROVOD_CUDA_HOME=/usr/local/cuda  # [cuda_compiler_version != 'None']
-    - HOROVOD_NCCL_HOME=$PREFIX  # [cuda_compiler_version == '10.1']
-    - HOROVOD_GPU_OPERATIONS=NCCL  # [cuda_compiler_version == '10.1']
+    - HOROVOD_NCCL_HOME=$PREFIX  # [cuda_compiler_version != 'None']
+    - HOROVOD_GPU_OPERATIONS=NCCL  # [cuda_compiler_version != 'None']
+    - HOROVOD_NCCL_LINK=SHARED  # [cuda_compiler_version != 'None']
     - HOROVOD_WITH_TENSORFLOW=1
     - HOROVOD_WITHOUT_PYTORCH=1
     - HOROVOD_WITHOUT_MXNET=1
@@ -33,6 +40,7 @@ requirements:
   build:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
+    - {{ compiler('cuda') }}  # [cuda_compiler_version != 'None']
     - cmake  >=3.7
     - make  # [unix]
     - python                                 # [build_platform != target_platform]
@@ -45,24 +53,22 @@ requirements:
     - pyyaml
     - cloudpickle
     - psutil
-    - nccl  # [cuda_compiler_version == '10.1']
+    - nccl  # [cuda_compiler_version != 'None']
     - mpich
     - mpi4py
-    - tensorflow-base {{ tf_version }}* mkl*  # [cuda_compiler_version == 'None']
-    - tensorflow-base {{ tf_version }}* gpu* # [cuda_compiler_version != 'None']
-    - cudatoolkit {{ cuda_compiler_version }}*  # [cuda_compiler_version != 'None']
+    - tensorflow {{ tf_version }}.* {{ tf_variant }}*
 
   run:
     - python
     - pyyaml
     - cloudpickle
     - psutil
-    - nccl  # [cuda_compiler_version == '10.1']
+    - nccl  # [cuda_compiler_version != 'None']
     - {{ pin_compatible('mpich') }}
-    - {{ pin_compatible('cudatoolkit', max_pin='x.x') }}*  # [cuda_compiler_version != 'None']
     - mpi4py
-    - tensorflow-base {{ tf_version }}* mkl*  # [cuda_compiler_version == 'None']
-    - tensorflow-base {{ tf_version }}* gpu* # [cuda_compiler_version != 'None']
+    - tensorflow {{ tf_version }}.* {{ tf_variant }}*
+    - tensorflow-estimator
+    - __cuda  # [cuda_compiler_version != "None"]
 
 
 test:
