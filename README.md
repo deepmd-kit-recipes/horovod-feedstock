@@ -31,52 +31,52 @@ Current build status
         <table>
           <thead><tr><th>Variant</th><th>Status</th></tr></thead>
           <tbody><tr>
-              <td>linux_64_cuda_compiler_version10.1python3.7.</td>
+              <td>linux_64_cuda_compiler_version10.2python3.10.</td>
               <td>
                 <a href="https://dev.azure.com/deepmd-kit-recipes/feedstock-builds/_build/latest?definitionId=&branchName=master">
-                  <img src="https://dev.azure.com/deepmd-kit-recipes/feedstock-builds/_apis/build/status/horovod-feedstock?branchName=master&jobName=linux&configuration=linux_64_cuda_compiler_version10.1python3.7._" alt="variant">
+                  <img src="https://dev.azure.com/deepmd-kit-recipes/feedstock-builds/_apis/build/status/horovod-feedstock?branchName=master&jobName=linux&configuration=linux_64_cuda_compiler_version10.2python3.10._" alt="variant">
                 </a>
               </td>
             </tr><tr>
-              <td>linux_64_cuda_compiler_version10.1python3.8.</td>
+              <td>linux_64_cuda_compiler_version10.2python3.8.</td>
               <td>
                 <a href="https://dev.azure.com/deepmd-kit-recipes/feedstock-builds/_build/latest?definitionId=&branchName=master">
-                  <img src="https://dev.azure.com/deepmd-kit-recipes/feedstock-builds/_apis/build/status/horovod-feedstock?branchName=master&jobName=linux&configuration=linux_64_cuda_compiler_version10.1python3.8._" alt="variant">
+                  <img src="https://dev.azure.com/deepmd-kit-recipes/feedstock-builds/_apis/build/status/horovod-feedstock?branchName=master&jobName=linux&configuration=linux_64_cuda_compiler_version10.2python3.8._" alt="variant">
                 </a>
               </td>
             </tr><tr>
-              <td>linux_64_cuda_compiler_version10.1python3.9.</td>
+              <td>linux_64_cuda_compiler_version10.2python3.9.</td>
               <td>
                 <a href="https://dev.azure.com/deepmd-kit-recipes/feedstock-builds/_build/latest?definitionId=&branchName=master">
-                  <img src="https://dev.azure.com/deepmd-kit-recipes/feedstock-builds/_apis/build/status/horovod-feedstock?branchName=master&jobName=linux&configuration=linux_64_cuda_compiler_version10.1python3.9._" alt="variant">
+                  <img src="https://dev.azure.com/deepmd-kit-recipes/feedstock-builds/_apis/build/status/horovod-feedstock?branchName=master&jobName=linux&configuration=linux_64_cuda_compiler_version10.2python3.9._" alt="variant">
                 </a>
               </td>
             </tr><tr>
-              <td>linux_64_cuda_compiler_version11.3python3.7.</td>
+              <td>linux_64_cuda_compiler_version11.6python3.10.</td>
               <td>
                 <a href="https://dev.azure.com/deepmd-kit-recipes/feedstock-builds/_build/latest?definitionId=&branchName=master">
-                  <img src="https://dev.azure.com/deepmd-kit-recipes/feedstock-builds/_apis/build/status/horovod-feedstock?branchName=master&jobName=linux&configuration=linux_64_cuda_compiler_version11.3python3.7._" alt="variant">
+                  <img src="https://dev.azure.com/deepmd-kit-recipes/feedstock-builds/_apis/build/status/horovod-feedstock?branchName=master&jobName=linux&configuration=linux_64_cuda_compiler_version11.6python3.10._" alt="variant">
                 </a>
               </td>
             </tr><tr>
-              <td>linux_64_cuda_compiler_version11.3python3.8.</td>
+              <td>linux_64_cuda_compiler_version11.6python3.8.</td>
               <td>
                 <a href="https://dev.azure.com/deepmd-kit-recipes/feedstock-builds/_build/latest?definitionId=&branchName=master">
-                  <img src="https://dev.azure.com/deepmd-kit-recipes/feedstock-builds/_apis/build/status/horovod-feedstock?branchName=master&jobName=linux&configuration=linux_64_cuda_compiler_version11.3python3.8._" alt="variant">
+                  <img src="https://dev.azure.com/deepmd-kit-recipes/feedstock-builds/_apis/build/status/horovod-feedstock?branchName=master&jobName=linux&configuration=linux_64_cuda_compiler_version11.6python3.8._" alt="variant">
                 </a>
               </td>
             </tr><tr>
-              <td>linux_64_cuda_compiler_version11.3python3.9.</td>
+              <td>linux_64_cuda_compiler_version11.6python3.9.</td>
               <td>
                 <a href="https://dev.azure.com/deepmd-kit-recipes/feedstock-builds/_build/latest?definitionId=&branchName=master">
-                  <img src="https://dev.azure.com/deepmd-kit-recipes/feedstock-builds/_apis/build/status/horovod-feedstock?branchName=master&jobName=linux&configuration=linux_64_cuda_compiler_version11.3python3.9._" alt="variant">
+                  <img src="https://dev.azure.com/deepmd-kit-recipes/feedstock-builds/_apis/build/status/horovod-feedstock?branchName=master&jobName=linux&configuration=linux_64_cuda_compiler_version11.6python3.9._" alt="variant">
                 </a>
               </td>
             </tr><tr>
-              <td>linux_64_cuda_compiler_versionNonepython3.7.</td>
+              <td>linux_64_cuda_compiler_versionNonepython3.10.</td>
               <td>
                 <a href="https://dev.azure.com/deepmd-kit-recipes/feedstock-builds/_build/latest?definitionId=&branchName=master">
-                  <img src="https://dev.azure.com/deepmd-kit-recipes/feedstock-builds/_apis/build/status/horovod-feedstock?branchName=master&jobName=linux&configuration=linux_64_cuda_compiler_versionNonepython3.7._" alt="variant">
+                  <img src="https://dev.azure.com/deepmd-kit-recipes/feedstock-builds/_apis/build/status/horovod-feedstock?branchName=master&jobName=linux&configuration=linux_64_cuda_compiler_versionNonepython3.10._" alt="variant">
                 </a>
               </td>
             </tr><tr>
@@ -118,16 +118,41 @@ conda config --add channels deepmodeling
 conda config --set channel_priority strict
 ```
 
-Once the `deepmodeling` channel has been enabled, `horovod` can be installed with:
+Once the `deepmodeling` channel has been enabled, `horovod` can be installed with `conda`:
 
 ```
 conda install horovod
 ```
 
-It is possible to list all of the versions of `horovod` available on your platform with:
+or with `mamba`:
+
+```
+mamba install horovod
+```
+
+It is possible to list all of the versions of `horovod` available on your platform with `conda`:
 
 ```
 conda search horovod --channel deepmodeling
+```
+
+or with `mamba`:
+
+```
+mamba search horovod --channel deepmodeling
+```
+
+Alternatively, `mamba repoquery` may provide more information:
+
+```
+# Search all versions available on your platform:
+mamba repoquery search horovod --channel deepmodeling
+
+# List packages depending on `horovod`:
+mamba repoquery whoneeds horovod --channel deepmodeling
+
+# List dependencies of `horovod`:
+mamba repoquery depends horovod --channel deepmodeling
 ```
 
 
