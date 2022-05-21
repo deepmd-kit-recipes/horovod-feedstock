@@ -1,6 +1,6 @@
 {% set name = "horovod" %}
-{% set version = "0.24.1" %}
-{% set tf_version = "2.7" %}
+{% set version = "0.24.3" %}
+{% set tf_version = "2.9" %}
 {% if cuda_compiler_version == "None" %}
 {% set tf_variant = "cpu" %}
 
@@ -15,8 +15,6 @@ package:
 source:
   git_url: https://github.com/horovod/horovod
   git_rev: v{{ version }}
-  patches:
-    - 0001-disable-XLA.patch
 
 build:
   number: 0
