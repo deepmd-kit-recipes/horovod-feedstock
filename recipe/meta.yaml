@@ -1,5 +1,5 @@
 {% set name = "horovod" %}
-{% set version = "0.24.3" %}
+{% set version = "0.25.0" %}
 {% set tf_version = "2.9" %}
 {% if cuda_compiler_version == "None" %}
 {% set tf_variant = "cpu" %}
